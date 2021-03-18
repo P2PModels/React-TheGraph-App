@@ -1,0 +1,69 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #09d3ac;
+}
+
+
+.button {
+  margin-left: 5% !important;
+  background:linear-gradient(45deg, #fe6b8b 30%, #ff8e53 90%) !important;
+  color:whitesmoke !important;
+  padding: 3% !important;
+  box-shadow: '0 3px 5px 2px rgba(255, 105, 135, .3)' !important;
+  width: 100%;
+}
+.button:hover {
+  background: linear-gradient(45deg, #f793a8 30%, #f1af8c 90%) !important; 
+}
+.divHeader {
+  margin-left: auto !important;
+  display: flex;
+  flex-direction: row;
+  width: 200px;
+}
+.divFilter {
+  margin-right: auto !important;
+  display: flex;
+  flex-direction: row;
+  width: 800px;
+}
+.divCardID{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.divCard {
+  display: flex;
+  flex-direction: row;
+}
+.divCardSpace {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.divCardCol {
+  display: flex;
+  flex-direction: column;
+  
+}
+.filter {
+  width: 100% !important;
+}

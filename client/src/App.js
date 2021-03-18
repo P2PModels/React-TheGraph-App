@@ -1,0 +1,259 @@
+import React, { Component } from "react";
+import SimpleStorageContract from "./contracts/EmployeeRegistry.json";
+import getWeb3 from "./getWeb3";
+import "./App.css";
+import ApolloClient, { gql, InMemoryCache } from 'apollo-boost'
+import { ApolloProvider, Query } from 'react-apollo'
+import {
+  Grid, LinearProgress, Dialog, DialogActions, DialogContent,
+  DialogContentText, DialogTitle, Button,AppBar, Toolbar
+} from '@material-ui/core'
+import Header from './components/Header'
+import Error from './components/Error'
+import Employees from './components/Employees'
+import Filter from './components/Filter'
+import CreateForm from './components/Form'
+import CreateFormUpdate from './components/FormUpdate'
+
+
+if (!process.env.REACT_APP_GRAPHQL_ENDPOINT) {
+  throw new Error('REACT_APP_GRAPHQL_ENDPOINT environment variable not defined')
+}
+
+
+const client = new ApolloClient({
+  uri: process.env.REACT_APP_GRAPHQL_ENDPOINT,
+  cache: new InMemoryCache(),
+})
+
+const EMPLOYEES_QUERY = gql`
+  query employees($where: Employee_filter!, $orderBy: Employee_orderBy!, $orderDirection: String!) {
+    employees(first: 100, where: $where, orderBy: $orderBy, orderDirection: $orderDirection) {
+      id
+      owner
+      name
+      age
+      role
+      salary
+    }
+  }
+`
+
+
+class App extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      withName: false,
+      orderBy: 'name',
+      orderDirection: 'asc',
+      showHelpDialog: false,
+      showCreateForm: false,
+      showCreateUpdate: false,
+      web3: null,
+      accounts: null,
+      contract: null,
+      name: null,
+      age: null,
+      role: null,
+      salary: null,
+      roleFilter:null
+    }
+  }
+ 
+  /*handleInputChange = (event) => {
+    const target = event.target;
+    var value = target.value;
+    const name = target.name;
+
+    console.log(name);
+    console.log(value);
+    this.setState({
+      [name]: value
+    });
+  }*/
+
+  toggleHelpDialog = () => {
+    this.setState(state => ({ ...state, showHelpDialog: !state.showHelpDialog }))
+  }
+  toggleCreateForm = () => {
+    this.setState(state => ({ ...state, showCreateForm: !state.showCreateForm }))
+  }
+  toggleCreateUpdate= () => {
+    this.setState(state => ({ ...state, showCreateUpdate: !state.showCreateUpdate }))
+  }
+  gotoQuickStartGuide = () => {
+    window.location.href = 'https://thegraph.com/docs/quick-start'
+  }
+
+  componentDidMount = async () => {
+    try {
+      // Get network provider and web3 instance.
+      const web3 = await getWeb3();
+
+      // Use web3 to get the user's accounts.
+      const accounts = await web3.eth.getAccounts();
+
+      // Get the contract instance.
+      const networkId = await web3.eth.net.getId();
+      const deployedNetwork = SimpleStorageContract.networks[networkId];
+      const instance = new web3.eth.Contract(
+        SimpleStorageContract.abi,
+        deployedNetwork && deployedNetwork.address,
+      );
+
+      // Set web3, accounts, and contract to the state, and then proceed with an
+      // example of interacting with the contract's methods.
+      this.setState({ web3, accounts, contract: instance });
+    } catch (error) {
+      // Catch any errors for any of the above operations.
+      alert(
+        `Failed to load web3, accounts, or contract. Check console for details.`,
+      );
+      console.error(error);
+    }
+  };
+
+  
+  create = async () => {
+    const { accounts, contract, name, age, role, salary } = this.state;
+    await contract.methods.createEmployee(name, age, role, salary).send({ from: accounts[0] });
+  };
+
+  getEmployee  = async () => {
+    const {accounts, contract} = this.state;
+    const e = await contract.methods.getEmployee(accounts[0]).call();
+    sessionStorage.setItem("nameUpdate", e[0]);
+    sessionStorage.setItem("ageUpdate", Number(e[1]));
+    sessionStorage.setItem("roleUpdate", e[2]);
+    sessionStorage.setItem("salaryUpdate", Number(e[3]));
+    this.toggleCreateUpdate()
+  }
+
+  update = async () => {
+    const { accounts, contract, name, age, role, salary } = this.state;
+    if(name !=null)await contract.methods.updateEmployeeName(name).send({ from: accounts[0] });
+    if(age!=null)await contract.methods.updateEmployeeAge(age).send({ from: accounts[0] });
+    if(role!=null)await contract.methods.updateEmployeeRole(role).send({ from: accounts[0] });
+    if(salary!=null)await contract.methods.updateEmployeeSalary(salary).send({ from: accounts[0] });
+  };
+
+  render() {
+    if (!this.state.web3) {
+      return <div>Loading Web3, accounts, and contract...</div>;
+    }
+    const {withName, orderBy, orderDirection, showHelpDialog, showCreateForm, showCreateUpdate, name, age, role, salary, roleFilter} = this.state
+
+    return (
+      
+      <ApolloProvider client={client}>
+        <div className="App">
+          <Grid container direction="column">{console.log(orderDirection)}
+            <AppBar position="static" style={{ background: '#292e39' }}>
+              <Toolbar>
+                <Filter className="filter"
+                  orderBy={orderBy}
+                  orderDirection={orderDirection}
+                  withName={withName}
+                  onOrderBy={field => this.setState(state => ({ ...state, orderBy: field }))}
+                  onOrderDirection={field => this.setState(state => ({ ...state, orderDirection: field }))}
+                  onToggleWithName={() =>
+                    this.setState(state => ({ ...state, withName: !state.withName }))
+                  }
+                  onFilterByRole= {field => this.setState(state => ({ ...state, roleFilter: field }))}
+                />
+                <Header 
+                  onHelp={this.toggleHelpDialog} 
+                  onCreate={this.toggleCreateForm}
+                  onUpdate={this.getEmployee}
+                />
+              </Toolbar>
+            </AppBar>
+            <Grid item>
+              <Grid container>
+                <Query
+                  query={EMPLOYEES_QUERY}
+                  variables={{
+                    where: {
+                      ...(withName ? { name_not: '' } : {}),
+                      ...(roleFilter ? {role: roleFilter} : {})
+                    },
+                    orderBy: orderBy,
+                    orderDirection: orderDirection,
+                  }}
+                >
+                  {({ data, error, loading }) => {
+                    return loading ? (
+                      <LinearProgress variant="query" style={{ width: '100%' }} />
+                    ) : error ? (
+                      <Error error={error} />
+                    ) : (
+                      <Employees employees={data.employees} />
+                    )
+                  }}
+                </Query>
+              </Grid>
+            </Grid>
+          </Grid>
+          <Dialog
+            fullScreen={false}
+            open={showHelpDialog}
+            onClose={this.toggleHelpDialog}
+            aria-labelledby="help-dialog"
+          >
+            <DialogTitle id="help-dialog">{'Do you need help?'}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+              Here you will be able to create, update and display employees. 
+              Also, you can filter by role, order by ID, name, owner or salary, and choose 
+              the order direction: ascendant or descendant. If you need more resources, visit our repository on Github.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.toggleHelpDialog} color="primary">
+                Nah, I'm good
+              </Button>
+              <Button onClick={this.gotoQuickStartGuide} color="primary" autoFocus>
+                Yes, please
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            fullScreen={false}
+            open={showCreateForm}
+            onClose={this.toggleCreateForm}
+            aria-labelledby="help-dialog"
+          >
+            <CreateForm
+              name={name}
+              age={age}
+              role={role}
+              salary={salary}
+              submit={  e => { e.preventDefault(); this.create(); this.toggleCreateForm() }}
+              onName={name1 => this.setState(state => ({ ...state, name: name1 }))}
+              onAge={age1 => this.setState(state => ({ ...state, age: age1 }))}
+              onRole={role1 => this.setState(state => ({ ...state, role: role1 }))}
+              onSalary={salary1 => this.setState(state => ({ ...state, salary: salary1}))}
+            /> {name}{age}{role}{salary}
+          </Dialog>
+          <Dialog
+            fullScreen={false}
+            open={showCreateUpdate}
+            onClose={this.toggleCreateUpdate}
+            aria-labelledby="help-dialog"
+          >
+            <CreateFormUpdate
+              submit={  e => { e.preventDefault(); this.update(); this.toggleCreateUpdate() }}
+              onName={name1 => this.setState(state => ({ ...state, name: name1 }))}
+              onAge={age1 => this.setState(state => ({ ...state, age: age1 }))}
+              onRole={role1 => this.setState(state => ({ ...state, role: role1 }))}
+              onSalary={salary1 => this.setState(state => ({ ...state, salary: salary1}))}
+            />
+          </Dialog>
+        </div>
+      </ApolloProvider>
+    );
+  }
+}
+
+export default App;
