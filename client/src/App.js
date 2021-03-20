@@ -83,7 +83,7 @@ class App extends Component {
     this.setState(state => ({ ...state, showCreateUpdate: !state.showCreateUpdate }))
   }
   gotoQuickStartGuide = () => {
-    window.location.href = 'https://thegraph.com/docs/quick-start'
+    window.location.href = 'https://github.com/P2PModels/React-TheGraph-App'
   }
 
   componentDidMount = async () => {
