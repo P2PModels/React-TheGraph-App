@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import SimpleStorageContract from "./contracts/EmployeeRegistry.json";
+import SimpleStorageContract from "./contracts/EmployeeContract.json";
 import getWeb3 from "./getWeb3";
 import "./App.css";
 import ApolloClient, { gql, InMemoryCache } from 'apollo-boost'
@@ -30,7 +30,6 @@ const EMPLOYEES_QUERY = gql`
   query employees($where: Employee_filter!, $orderBy: Employee_orderBy!, $orderDirection: String!) {
     employees(first: 100, where: $where, orderBy: $orderBy, orderDirection: $orderDirection) {
       id
-      owner
       name
       age
       role
@@ -120,22 +119,32 @@ class App extends Component {
     await contract.methods.createEmployee(name, age, role, salary).send({ from: accounts[0] });
   };
 
-  getEmployee  = async () => {
-    const {accounts, contract} = this.state;
-    const e = await contract.methods.getEmployee(accounts[0]).call();
+  getEmployee  = async (id) => {
+    const { contract} = this.state;
+    const e = await contract.methods.getEmployee(id).call();
+    sessionStorage.setItem("idUpdate", id);
     sessionStorage.setItem("nameUpdate", e[0]);
     sessionStorage.setItem("ageUpdate", Number(e[1]));
     sessionStorage.setItem("roleUpdate", e[2]);
     sessionStorage.setItem("salaryUpdate", Number(e[3]));
     this.toggleCreateUpdate()
   }
-
+  delete = async (id) => {
+    const {accounts, contract} = this.state;
+    await contract.methods.deleteEmployee(id).send({ from: accounts[0] });
+  }
   update = async () => {
     const { accounts, contract, name, age, role, salary } = this.state;
-    if(name !=null)await contract.methods.updateEmployeeName(name).send({ from: accounts[0] });
-    if(age!=null)await contract.methods.updateEmployeeAge(age).send({ from: accounts[0] });
-    if(role!=null)await contract.methods.updateEmployeeRole(role).send({ from: accounts[0] });
-    if(salary!=null)await contract.methods.updateEmployeeSalary(salary).send({ from: accounts[0] });
+    var name1, age1, role1, salary1
+    if(name ==null) name1 = sessionStorage.getItem("nameUpdate");
+    else name1 = name;
+    if(age==null)age1 = sessionStorage.getItem("ageUpdate");
+    else age1 = age;
+    if(role==null)role1 = sessionStorage.getItem("roleUpdate");
+    else role1 = role;
+    if(salary==null)salary1 = sessionStorage.getItem("salaryUpdate");
+    else salary1 = salary
+    await contract.methods.updateEmployeeName(sessionStorage.getItem("idUpdate"), name1, age1, role1, salary1).send({ from: accounts[0] });
   };
 
   render() {
@@ -165,7 +174,7 @@ class App extends Component {
                 <Header 
                   onHelp={this.toggleHelpDialog} 
                   onCreate={this.toggleCreateForm}
-                  onUpdate={this.getEmployee}
+                  //TODO cambiar el update a las card
                 />
               </Toolbar>
             </AppBar>
@@ -188,7 +197,9 @@ class App extends Component {
                     ) : error ? (
                       <Error error={error} />
                     ) : (
-                      <Employees employees={data.employees} />
+                      <Employees employees={data.employees} 
+                      onUpdate={id => this.getEmployee(id)}
+                      onDelete= {id => this.delete(id)}/>
                     )
                   }}
                 </Query>

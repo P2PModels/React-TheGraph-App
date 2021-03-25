@@ -1,4 +1,4 @@
-const Employee = artifacts.require("EmployeeRegistry");
+const Employee = artifacts.require("EmployeeContract");
 var SimpleStorage = artifacts.require("./SimpleStorage.sol");
 
 module.exports = function(deployer) {

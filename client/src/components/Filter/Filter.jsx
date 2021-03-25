@@ -64,7 +64,6 @@ const Filter = ({
           >
             <MenuItem value="id">ID</MenuItem>
             <MenuItem value="name">Name</MenuItem>
-            <MenuItem value="owner">Owner</MenuItem>
             <MenuItem value="salary">Salary</MenuItem>
           </Select>
         }

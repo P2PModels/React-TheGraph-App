@@ -8,9 +8,6 @@ const Header = ({ onHelp, onCreate, onUpdate }) => (
     <Button onClick={() => onCreate && onCreate()} className = "button">
       CREATE
     </Button>
-    <Button onClick={() => onUpdate && onUpdate()} className = "button">
-      UPDATE
-    </Button>
     </div>
     <Grid item>
       <IconButton

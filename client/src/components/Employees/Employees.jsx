@@ -7,9 +7,11 @@ import {
   Typography,
   createStyles,
   withStyles,
-  CardHeader,
   Divider,
+  IconButton,
 } from '@material-ui/core'
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 const employeeStyles = theme =>
   createStyles({
@@ -22,10 +24,6 @@ const employeeStyles = theme =>
       overflow: 'hidden',
     },
     id: {
-      textOverflow: 'ellipsis',
-      overflow: 'hidden',
-    },
-    owner: {
       textOverflow: 'ellipsis',
       overflow: 'hidden',
     },
@@ -44,45 +42,56 @@ const employeeStyles = theme =>
     },
   })
 
-const Employee = ({ classes, id, name, owner, role, salary, age }) => (
+const Employee = ({ classes, id, name, role, salary, age, onUpdate, onDelete }) => (
   <Grid item>
     <Card>
       <CardActionArea className={classes.actionArea}>
-      
+
         <CardContent>
           <div className='divCardID'>
-          <Typography color="textSecondary">ID</Typography>
-          <Typography component="p" className={classes.id}>
-            : {id}
-          </Typography>
+            <Typography color="textSecondary">ID</Typography>
+            <Typography component="p" className={classes.id}>
+              : {id}</Typography>
+            <div className='icons'>
+              <IconButton
+                aria-label="Delete"
+                fontSize="small"
+                onClick={() => onUpdate && onUpdate(id)}
+              >
+                <EditIcon />
+              </IconButton>
+              <IconButton
+                aria-label="Delete"
+                fontSize="small"
+                onClick={() => onDelete && onDelete(id)}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </div>
           </div>
           <Divider />
-         {/*} <Typography color="textSecondary">Owner</Typography>
-          <Typography component="p" className={classes.owner}>
-            {owner}
-          </Typography>*/}
           <div className='divCard'>
-          <Typography variant="h6" component="h3" className={classes.name}>
-            {name || '—'}
-          </Typography>
-         {/*<Typography color="textSecondary">Age</Typography>*/}
-          <Typography component="p" className={classes.age}>
-          , {age}
-          </Typography>
+            <Typography variant="h6" component="h3" className={classes.name}>
+              {name || '—'}
+            </Typography>
+            {/*<Typography color="textSecondary">Age</Typography>*/}
+            <Typography component="p" className={classes.age}>
+              , {age}
+            </Typography>
           </div>
           <div className='divCardSpace'>
-          <div className='divCardCol'>
-          <Typography color="textSecondary">Role</Typography>
-          <Typography component="p" className={classes.role}>
-            {role}
-          </Typography>
-          </div>
-          <div className='divCardCol'>
-          <Typography color="textSecondary">Salary</Typography>
-          <Typography component="p" className={classes.salary}>
-            {salary}
-          </Typography>
-          </div>
+            <div className='divCardCol'>
+              <Typography color="textSecondary">Role</Typography>
+              <Typography component="p" className={classes.role}>
+                {role}
+              </Typography>
+            </div>
+            <div className='divCardCol'>
+              <Typography color="textSecondary">Salary</Typography>
+              <Typography component="p" className={classes.salary}>
+                {salary}
+              </Typography>
+            </div>
           </div>
         </CardContent>
       </CardActionArea>
@@ -104,7 +113,7 @@ const employeesStyles = theme =>
     },
   })
 
-const Employees = ({ classes, employees }) => (
+const Employees = ({ classes, employees, onUpdate, onDelete }) => (
   <Grid container direction="column" spacing={1}>
     <Grid item>
       <Typography variant="h6" className={classes.title}>
@@ -114,7 +123,9 @@ const Employees = ({ classes, employees }) => (
     <Grid item className={classes.prueba}>
       <Grid container direction="row" spacing={8}>
         {employees.map(employee => (
-          <StyledEmployee key={employee.id} {...employee} />
+          <StyledEmployee key={employee.id} {...employee}
+            onUpdate={() => onUpdate && onUpdate(employee.id)}
+            onDelete={() => onDelete && onDelete(employee.id)} />
         ))}
       </Grid>
     </Grid>

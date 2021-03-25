@@ -1,87 +1,57 @@
 pragma solidity >=0.5.0;
 
-contract EmployeeRegistry {
-  event NewEmployee(uint id, address owner, string name, int age, string role, int salary);
-  event UpdatedEmployee(uint id, address owner, string name, int age, string role, int salary);
+contract EmployeeContract {
+  event NewEmployee(uint id, string name, int age, string role, int salary);
+  event UpdatedEmployee(uint id, string name, int age, string role, int salary);
+  event DeleteEmployee(uint id);
 
   struct Employee {
-    address owner;
     string name;
     int age;
     string role;
     int salary;
-    
   }
 
-  Employee[] public employees;
- 
+  mapping (uint => Employee) public employees;
+  uint employeesLength;
+  address manager;
   
   mapping (uint => address) public employeeToOwner;
   mapping (address => uint) public ownerToEmployee;
-
-  function createEmployee(string memory name, int age, string memory role, int salary) public {
-    require(ownerToEmployee[msg.sender] == 0);
-    employees.push(Employee(msg.sender, name, age, role, salary));
-    uint id = employees.length-1;
-    employeeToOwner[id] = msg.sender;
-    ownerToEmployee[msg.sender] = id;
+    constructor() public{
+         employeesLength = 0;
+         manager = 0x59BDe5BBA8549503D88EBE11FE47b39989Dda3a9;
+    }
     
-    emit NewEmployee(id, msg.sender, name, age, role, salary);
+    modifier onlyOwner() {
+        require(manager == msg.sender);
+        _;
+    }
+  function createEmployee(string memory name, int age, string memory role, int salary) onlyOwner public {
+    employees[employeesLength]  = Employee(name, age, role, salary);
+    employeesLength++;
+    
+    emit NewEmployee(employeesLength - 1 , name, age, role, salary);
   }
 
-  function getEmployee(address owner) public view returns (string memory, int, string memory, int) {
-    uint id = ownerToEmployee[owner];
+  function getEmployee(uint id) public view returns (string memory, int, string memory, int) {
     return (employees[id].name, employees[id].age, employees[id].role, employees[id].salary);
   }
 
-  function updateEmployeeName(string memory name) public {
-    require(ownerToEmployee[msg.sender] != 0);
-    require(msg.sender == employees[ownerToEmployee[msg.sender]].owner);
-
-    uint id = ownerToEmployee[msg.sender];
-
+  function updateEmployeeName(uint id, string memory name, int age, string memory role, int salary) onlyOwner public {
     employees[id].name = name;
-    emit UpdatedEmployee(id, msg.sender, name, employees[id].age, employees[id].role, employees[id].salary);
-  }
-
-  function updateEmployeeRole(string memory role) public {
-    require(ownerToEmployee[msg.sender] != 0);
-    require(msg.sender == employees[ownerToEmployee[msg.sender]].owner);
-
-    uint id = ownerToEmployee[msg.sender];
-
-    employees[id].role =  role;
-    emit UpdatedEmployee(id, msg.sender, employees[id].name,employees[id].age, role, employees[id].salary);
-  }
-  function updateEmployeeAge(int age) public {
-    require(ownerToEmployee[msg.sender] != 0);
-    require(msg.sender == employees[ownerToEmployee[msg.sender]].owner);
-
-    uint id = ownerToEmployee[msg.sender];
-
     employees[id].age =  age;
-    emit UpdatedEmployee(id, msg.sender, employees[id].name,age, employees[id].role, employees[id].salary);
-  }
-  function updateEmployeeSalary(int salary) public {
-    require(ownerToEmployee[msg.sender] != 0);
-    require(msg.sender == employees[ownerToEmployee[msg.sender]].owner);
-
-    uint id = ownerToEmployee[msg.sender];
-
+    employees[id].role =  role;
     employees[id].salary =  salary;
-    emit UpdatedEmployee(id, msg.sender, employees[id].name,employees[id].age, employees[id].role, salary);
+    emit UpdatedEmployee(id, name, age, role, salary);
   }
 
-  // the gravatar at position 0 of gravatars[]
-  // is fake
-  // it's a mythical gravatar
-  // that doesn't really exist
-  // dani will invoke this function once when this contract is deployed
-  // but then no more
-  function setMythicalEmployee() public {
-    require(msg.sender == 0x8d3e809Fbd258083a5Ba004a527159Da535c8abA);
-    
-    employees.push(Employee(0x0000000000000000000000000000000000000000, " ",0, " ",0));
+  function deleteEmployee(uint id) onlyOwner public {
+       for (uint j = id; j < employeesLength - 1; j++){
+                employees[j] = employees[j+1];
+            }
+      delete employees[employeesLength-1];
+      employeesLength--;
+      emit DeleteEmployee(id);
   }
-  function prueba() public{}
 }
