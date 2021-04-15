@@ -55,6 +55,7 @@ query employees_mongo{
   
   employees_mongo {
     _id
+    idBlockchain
     direction
   }
 

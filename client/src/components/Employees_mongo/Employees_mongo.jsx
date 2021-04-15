@@ -26,7 +26,7 @@ const employeeStyles = theme =>
     },
   })
 
-const Employee_mongo = ({ classes, id, direction}) => (
+const Employee_mongo = ({ classes, id,idBlockchain, direction}) => (
   <Grid item>
     <Card>
       <CardActionArea className={classes.actionArea}>
@@ -35,7 +35,7 @@ const Employee_mongo = ({ classes, id, direction}) => (
           <div className='divCardID'>
             <Typography color="textSecondary">ID</Typography>
             <Typography component="p" className={classes.id}>
-              : {id}</Typography>
+              : {idBlockchain}</Typography>
           </div>
           <Divider />
           <div className='divCard'>
