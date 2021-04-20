@@ -8,8 +8,10 @@ import {
   createStyles,
   withStyles,
   Divider,
+  IconButton,
 } from '@material-ui/core'
-
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
 const employeeStyles = theme =>
   createStyles({
     actionArea: {
@@ -26,18 +28,24 @@ const employeeStyles = theme =>
     },
   })
 
-const Employee_mongo = ({ classes, id,idBlockchain, direction}) => (
+const Employee_mongo = ({ classes, _id,idBlockchain, direction, onUpdate, onDelete}) => (
   <Grid item>
     <Card>
       <CardActionArea className={classes.actionArea}>
 
         <CardContent>
+        <div className='divCardID'>
+            <Typography color="textSecondary">ID</Typography>
+            <Typography component="p" className={classes.id}>
+              : {_id}</Typography>
+            
+          </div>
+          <Divider />
           <div className='divCardID'>
             <Typography color="textSecondary">ID</Typography>
             <Typography component="p" className={classes.id}>
               : {idBlockchain}</Typography>
           </div>
-          <Divider />
           <div className='divCard'>
             <Typography variant="h6" component="h3" className={classes.direction}>
               {direction || '—'}
@@ -74,7 +82,8 @@ const Employees_mongo = ({ classes, employees_mongo, onUpdate, onDelete }) => (
     <Grid item className={classes.prueba}>
       <Grid container direction="row" spacing={8}>
         {employees_mongo.map(employee_mongo => (
-          <StyledEmployee key={employee_mongo.id} {...employee_mongo}/>
+          <StyledEmployee key={employee_mongo.id} {...employee_mongo}
+            />
         ))}
       </Grid>
     </Grid>

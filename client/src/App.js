@@ -2,9 +2,11 @@ import React, { Component } from "react";
 import SimpleStorageContract from "./contracts/EmployeeContract.json";
 import getWeb3 from "./getWeb3";
 import "./App.css";
-import ApolloClient, { gql, InMemoryCache } from 'apollo-boost'
+import ApolloClient, { InMemoryCache } from 'apollo-boost'
 
-import { ApolloProvider, Query } from 'react-apollo'
+import { ApolloProvider, Query, Mutation } from 'react-apollo'
+import { gql, useMutation } from '@apollo/client';
+
 import {
   Grid, LinearProgress, Dialog, DialogActions, DialogContent,
   DialogContentText, DialogTitle, Button, AppBar, Toolbar, Box, Typography, Tabs, Tab
@@ -62,6 +64,37 @@ query employees_mongo{
 }
 `
 
+const ADD_DIRECTION = gql`
+  mutation createEmployee_mongo ($input: EmployeeInput ) {
+    createEmployee_mongo(input: $input) {
+      _id
+      idBlockchain 
+      direction
+    }
+  }
+
+`;
+
+const DELETE_DIRECTION = gql`
+  mutation deleteEmployee_mongo ($_id: ID ) {
+    deleteEmployee_mongo(_id: $_id) {
+      _id
+      idBlockchain 
+      direction
+    }
+  }
+`;
+
+const UPDATE_DIRECTION = gql`
+  mutation updateEmployee_mongo ($_id: ID, $input: EmployeeInput ) {
+    updateEmployee_mongo(_id: $_id, input: $input) {
+      _id
+      idBlockchain 
+      direction
+    }
+  }
+
+`;
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -93,6 +126,109 @@ function a11yProps(index) {
     id: `simple-tab-${index}`,
     'aria-controls': `simple-tabpanel-${index}`,
   };
+}
+function CreateEmployee_mongojeje(){
+  let input1;
+  let input2;
+  const [createEmployee_mongo, { data }] = useMutation(ADD_DIRECTION, {client: client_mongo});
+  return (
+    <div>
+      
+    <form
+      onSubmit={e => {
+        e.preventDefault();
+        createEmployee_mongo({ variables: {input:{idBlockchain: parseInt(input2.value), direction: input1.value } },
+          errorPolicy:"all"});
+        input1.value = '';
+        input2.value = null;
+      }}
+    >
+      <input
+        type="number"
+        ref={node1 => {
+          input2 = node1;
+        }}  
+        placeholder="ID"
+      />
+      <input
+        ref={node => {
+          input1 = node;
+        }}
+        placeholder="Direction"
+      />
+      <button type="submit">Add direction</button>
+    </form>
+      </div>
+  )
+}
+function Delete_mongo(){
+  let input;
+  const [deleteEmployee_mongo, { data }] = useMutation(DELETE_DIRECTION, {client: client_mongo});
+  return (
+    <div>
+      
+    <form
+      onSubmit={e => {
+        e.preventDefault();
+        deleteEmployee_mongo({ variables: {_id:input.value },
+          errorPolicy:"all"});
+        input.value = '';
+      }}
+    >
+      <input
+       
+        ref={node1 => {
+          input = node1;
+        }}  
+        placeholder="ID"
+      />
+      
+      <button type="submit">delete direction</button>
+    </form>
+      </div>
+  )
+}
+function Update_mongo(){
+  let input1;
+  let input2;
+  let input3;
+  const [updateEmployee_mongo, { data }] = useMutation(UPDATE_DIRECTION, {client: client_mongo});
+  return (
+    <div>
+      
+    <form
+      onSubmit={e => {
+        e.preventDefault();
+        updateEmployee_mongo({ variables: {_id: input3.value, input:{idBlockchain: parseInt(input2.value), direction: input1.value } },
+          errorPolicy:"all"});
+        input1.value = '';
+        input2.value = null;
+        input3.value= '';
+      }}
+    >
+      <input
+        ref={node2 => {
+          input3 = node2;
+        }}  
+        placeholder="ID"
+      />
+      <input
+        type="number"
+        ref={node1 => {
+          input2 = node1;
+        }}  
+        placeholder="ID Blockain"
+      />
+      <input
+        ref={node => {
+          input1 = node;
+        }}
+        placeholder="Direction"
+      />
+      <button type="submit">Update direction</button>
+    </form>
+      </div>
+  )
 }
 class App extends Component {
   constructor(props) {
@@ -206,13 +342,15 @@ class App extends Component {
   handleChange = (event, newValue) => {
     this.setState(state => ({ ...state, value: newValue }))
   
-  };
+  }; 
+   
   render() {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
     const { withName, orderBy, orderDirection, showHelpDialog, showCreateForm, showCreateUpdate, name, age, role, salary, roleFilter, value } = this.state
-
+    
+   
     return (
 
       <ApolloProvider client={client}>
@@ -268,13 +406,16 @@ class App extends Component {
                     ) : (
                       <Employees employees={data.employees}
                         onUpdate={id => this.getEmployee(id)}
-                    onDelete={id => this.delete(id)} />
+                        onDelete={id => this.delete(id)} />
                     )
                   }}
                 </Query>
               
               </TabPanel>
               <TabPanel value={value} index={1}>
+              <CreateEmployee_mongojeje></CreateEmployee_mongojeje>
+              <Update_mongo></Update_mongo>
+              <Delete_mongo></Delete_mongo>
               <Query
                   query={EMPLOYEES_QUERY_MONGO}
                   client={client_mongo}
@@ -285,10 +426,12 @@ class App extends Component {
                     ) : error ? (
                       <Error error={error} />
                     ) : (
-                      <Employees_mongo employees_mongo={data.employees_mongo} />
+                      <Employees_mongo employees_mongo={data.employees_mongo}   />
                     )
                   }}
                 </Query>
+               
+               
               </TabPanel>
                 
 
