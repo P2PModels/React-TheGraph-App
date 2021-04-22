@@ -57,7 +57,7 @@ const Filter = ({
       <FormControlLabel
         control={
           <Select
-            color="secondary"
+            color="primary"
             className={classes.orderBySelect}
             value={orderBy}
             onChange={event => onOrderBy && onOrderBy(event.target.value)}
@@ -75,7 +75,7 @@ const Filter = ({
       <FormControlLabel
         control={
           <Select
-            color="secondary"
+            color="primary"
             className={classes.orderBySelect}
             value={orderDirection}
             onChange={event => onOrderDirection && onOrderDirection(event.target.value)}
@@ -96,7 +96,7 @@ const Filter = ({
             name="roleFilter"
             variant="filled"
             size='small'
-            color="secondary"
+            color="primary"
             InputLabelProps={{className: classes.floatingLabelFocusStyle,}}
             label="Filter by Role"
             value={roleFilter}

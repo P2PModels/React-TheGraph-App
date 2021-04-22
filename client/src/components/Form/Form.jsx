@@ -64,7 +64,7 @@ const CreateForm = ({
                   label="Name"
                   autoFocus
                   value={name}
-                  color="secondary"
+                  color="primary"
                   onChange={event => onName && onName(event.target.value)}
                 />
               </Grid>
@@ -78,7 +78,7 @@ const CreateForm = ({
                   name="age"
                   type="number"
                   value={age}
-                  color="secondary"
+                  color="primary"
                   onChange={event => onAge && onAge(event.target.value)}
                 />
               </Grid>
@@ -91,7 +91,7 @@ const CreateForm = ({
                   label="Role"
                   name="role"
                   value={role}
-                  color="secondary"
+                  color="primary"
                   onChange={event => onRole && onRole(event.target.value)}
                 />
               </Grid>
@@ -105,7 +105,7 @@ const CreateForm = ({
                   type="number"
                   id="salary"
                   value={salary}
-                  color="secondary"
+                  color="primary"
                   onChange={event => onSalary && onSalary(event.target.value)}
                 />
               </Grid>

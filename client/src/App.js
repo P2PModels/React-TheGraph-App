@@ -4,13 +4,14 @@ import getWeb3 from "./getWeb3";
 import "./App.css";
 import ApolloClient, { InMemoryCache } from 'apollo-boost'
 
-import { ApolloProvider, Query, Mutation } from 'react-apollo'
+import { ApolloProvider, Query } from 'react-apollo'
 import { gql, useMutation } from '@apollo/client';
 
 import {
   Grid, LinearProgress, Dialog, DialogActions, DialogContent,
-  DialogContentText, DialogTitle, Button, AppBar, Toolbar, Box, Typography, Tabs, Tab
+  DialogContentText, DialogTitle, Button, AppBar, Toolbar, Box, Typography, Tabs, Tab, IconButton
 } from '@material-ui/core'
+import HelpIcon from '@material-ui/icons/Help'
 import Header from './components/Header'
 import Error from './components/Error'
 import Employees from './components/Employees'
@@ -21,7 +22,6 @@ import CreateFormUpdate from './components/FormUpdate'
 
 import PropTypes from 'prop-types';
 
-import { RestLink } from 'apollo-link-rest';
 if (!process.env.REACT_APP_GRAPHQL_ENDPOINT) {
   throw new Error('REACT_APP_GRAPHQL_ENDPOINT environment variable not defined')
 }
@@ -31,12 +31,12 @@ if (!process.env.REACT_APP_GRAPHQL_ENDPOINT) {
 const client = new ApolloClient({
   uri: process.env.REACT_APP_GRAPHQL_ENDPOINT,
   cache: new InMemoryCache()
- 
+
 })
 const client_mongo = new ApolloClient({
-  uri: "http://localhost:3001/graphql", 
+  uri: "http://localhost:3001/graphql",
   cache: new InMemoryCache()
- 
+
 })
 
 const EMPLOYEES_QUERY = gql`
@@ -55,7 +55,7 @@ const EMPLOYEES_QUERY = gql`
 const EMPLOYEES_QUERY_MONGO = gql`
 query employees_mongo{
   
-  employees_mongo {
+  employees_mongo{
     _id
     idBlockchain
     direction
@@ -127,107 +127,114 @@ function a11yProps(index) {
     'aria-controls': `simple-tabpanel-${index}`,
   };
 }
-function CreateEmployee_mongojeje(){
+function CreateEmployee_mongojeje() {
   let input1;
   let input2;
-  const [createEmployee_mongo, { data }] = useMutation(ADD_DIRECTION, {client: client_mongo});
+  const [createEmployee_mongo] = useMutation(ADD_DIRECTION, { client: client_mongo });
   return (
-    <div>
-      
-    <form
-      onSubmit={e => {
-        e.preventDefault();
-        createEmployee_mongo({ variables: {input:{idBlockchain: parseInt(input2.value), direction: input1.value } },
-          errorPolicy:"all"});
-        input1.value = '';
-        input2.value = null;
-      }}
-    >
-      <input
-        type="number"
-        ref={node1 => {
-          input2 = node1;
-        }}  
-        placeholder="ID"
-      />
-      <input
-        ref={node => {
-          input1 = node;
+    <div className="divFM">
+
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          createEmployee_mongo({
+            variables: { input: { idBlockchain: parseInt(input2.value), direction: input1.value } },
+            errorPolicy: "all"
+          });
+          input1.value = '';
+          input2.value = null;
         }}
-        placeholder="Direction"
-      />
-      <button type="submit">Add direction</button>
-    </form>
-      </div>
+      >
+        <input
+          type="number"
+          ref={node1 => {
+            input2 = node1;
+          }}
+          placeholder="ID"
+          className="inputs"
+        />
+        <input
+          ref={node => {
+            input1 = node;
+          }}
+          placeholder="Direction"
+        />
+        <button type="submit" className="buttonF">Add direction</button>
+      </form>
+    </div>
   )
 }
-function Delete_mongo(){
+function Delete_mongo() {
   let input;
-  const [deleteEmployee_mongo, { data }] = useMutation(DELETE_DIRECTION, {client: client_mongo});
+  const [deleteEmployee_mongo] = useMutation(DELETE_DIRECTION, { client: client_mongo });
   return (
     <div>
-      
-    <form
-      onSubmit={e => {
-        e.preventDefault();
-        deleteEmployee_mongo({ variables: {_id:input.value },
-          errorPolicy:"all"});
-        input.value = '';
-      }}
-    >
-      <input
-       
-        ref={node1 => {
-          input = node1;
-        }}  
-        placeholder="ID"
-      />
-      
-      <button type="submit">delete direction</button>
-    </form>
-      </div>
+
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          deleteEmployee_mongo({
+            variables: { _id: input.value },
+            errorPolicy: "all"
+          });
+          input.value = '';
+        }}
+      >
+        <input
+
+          ref={node1 => {
+            input = node1;
+          }}
+          placeholder="ID"
+        />
+
+        <button type="submit" className="buttonF">delete direction</button>
+      </form>
+    </div>
   )
 }
-function Update_mongo(){
+function Update_mongo() {
   let input1;
   let input2;
   let input3;
-  const [updateEmployee_mongo, { data }] = useMutation(UPDATE_DIRECTION, {client: client_mongo});
+  const [updateEmployee_mongo] = useMutation(UPDATE_DIRECTION, { client: client_mongo });
   return (
     <div>
-      
-    <form
-      onSubmit={e => {
-        e.preventDefault();
-        updateEmployee_mongo({ variables: {_id: input3.value, input:{idBlockchain: parseInt(input2.value), direction: input1.value } },
-          errorPolicy:"all"});
-        input1.value = '';
-        input2.value = null;
-        input3.value= '';
-      }}
-    >
-      <input
-        ref={node2 => {
-          input3 = node2;
-        }}  
-        placeholder="ID"
-      />
-      <input
-        type="number"
-        ref={node1 => {
-          input2 = node1;
-        }}  
-        placeholder="ID Blockain"
-      />
-      <input
-        ref={node => {
-          input1 = node;
+
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          updateEmployee_mongo({
+            variables: { _id: input3.value, input: { idBlockchain: parseInt(input2.value), direction: input1.value } },
+            errorPolicy: "all"
+          });
+          input1.value = '';
+          input2.value = null;
+          input3.value = '';
         }}
-        placeholder="Direction"
-      />
-      <button type="submit">Update direction</button>
-    </form>
-      </div>
+      >
+        <input
+          ref={node2 => {
+            input3 = node2;
+          }}
+          placeholder="ID"
+        />
+        <input
+          type="number"
+          ref={node1 => {
+            input2 = node1;
+          }}
+          placeholder="ID Blockain"
+        />
+        <input
+          ref={node => {
+            input1 = node;
+          }}
+          placeholder="Direction"
+        />
+        <button type="submit" className="buttonF">Update direction</button>
+      </form>
+    </div>
   )
 }
 class App extends Component {
@@ -238,6 +245,10 @@ class App extends Component {
       orderBy: 'name',
       orderDirection: 'asc',
       showHelpDialog: false,
+      showHelpDialogMongo: false,
+      showCreateMongo: false,
+      showUpdateMongo: false,
+      showDeleteMongo: false,
       showCreateForm: false,
       showCreateUpdate: false,
       web3: null,
@@ -248,7 +259,7 @@ class App extends Component {
       role: null,
       salary: null,
       roleFilter: null,
-      value:0
+      value: 0
     }
   }
 
@@ -263,9 +274,21 @@ class App extends Component {
       [name]: value
     });
   }*/
- 
+
   toggleHelpDialog = () => {
     this.setState(state => ({ ...state, showHelpDialog: !state.showHelpDialog }))
+  }
+  toggleHelpDialogMongo = () => {
+    this.setState(state => ({ ...state, showHelpDialogMongo: !state.showHelpDialogMongo }))
+  }
+  toggleCreateMongo = () => {
+    this.setState(state => ({ ...state, showCreateMongo: !state.showCreateMongo }))
+  }
+  toggleUpdateMongo = () => {
+    this.setState(state => ({ ...state, showUpdateMongo: !state.showUpdateMongo }))
+  }
+  toggleDeleteMongo = () => {
+    this.setState(state => ({ ...state, showDeleteMongo: !state.showDeleteMongo }))
   }
   toggleCreateForm = () => {
     this.setState(state => ({ ...state, showCreateForm: !state.showCreateForm }))
@@ -338,163 +361,271 @@ class App extends Component {
     else salary1 = salary
     await contract.methods.updateEmployeeName(sessionStorage.getItem("idUpdate"), name1, age1, role1, salary1).send({ from: accounts[0] });
   };
-  
+
   handleChange = (event, newValue) => {
     this.setState(state => ({ ...state, value: newValue }))
-  
-  }; 
-   
+
+  };
+
   render() {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
-    const { withName, orderBy, orderDirection, showHelpDialog, showCreateForm, showCreateUpdate, name, age, role, salary, roleFilter, value } = this.state
-    
-   
+    const { withName, orderBy, orderDirection, showCreateMongo, showUpdateMongo, showDeleteMongo, showHelpDialog, showHelpDialogMongo, showCreateForm, showCreateUpdate, name, age, role, salary, roleFilter, value } = this.state
+
+
     return (
 
       <ApolloProvider client={client}>
         <div className="App">
           <Grid container direction="column">
-            <AppBar position="static" style={{ background: '#292e39' }}>
-              <Toolbar>
-                <Filter className="filter"
-                  orderBy={orderBy}
-                  orderDirection={orderDirection}
-                  withName={withName}
-                  onOrderBy={field => this.setState(state => ({ ...state, orderBy: field }))}
-                  onOrderDirection={field => this.setState(state => ({ ...state, orderDirection: field }))}
-                  onToggleWithName={() =>
-                    this.setState(state => ({ ...state, withName: !state.withName }))
-                  }
-                  onFilterByRole={field => this.setState(state => ({ ...state, roleFilter: field }))}
-                />
-                <Header
-                  onHelp={this.toggleHelpDialog}
-                  onCreate={this.toggleCreateForm}
-                //TODO cambiar el update a las card
-                />
-              </Toolbar>
-            </AppBar>
+
             <Grid item>
               <Grid container>
-               
-              <AppBar position="static">
-                <Tabs value={value} onChange={this.handleChange} aria-label="simple tabs example">
-                  <Tab label="Blockchain" {...a11yProps(0)} />
-                  <Tab label="MongoDB"  {...a11yProps(1)}/>
-                </Tabs>
-              </AppBar>
-              <TabPanel value={value} index={0}>
-              <Query
-                  query={EMPLOYEES_QUERY}
-                  client={client}
-                  variables={{
-                    where: {
-                      ...(withName ? { name_not: '' } : {}),
-                      ...(roleFilter ? { role: roleFilter } : {})
-                    },
-                    orderBy: orderBy,
-                    orderDirection: orderDirection,
-                  }}
-                >
-                  {({ data, error, loading }) => {
-                    return loading ? (
-                      <LinearProgress variant="query" style={{ width: '100%' }} />
-                    ) : error ? (
-                      <Error error={error} />
-                    ) : (
-                      <Employees employees={data.employees}
-                        onUpdate={id => this.getEmployee(id)}
-                        onDelete={id => this.delete(id)} />
-                    )
-                  }}
-                </Query>
-              
-              </TabPanel>
-              <TabPanel value={value} index={1}>
-              <CreateEmployee_mongojeje></CreateEmployee_mongojeje>
-              <Update_mongo></Update_mongo>
-              <Delete_mongo></Delete_mongo>
-              <Query
-                  query={EMPLOYEES_QUERY_MONGO}
-                  client={client_mongo}
-                >
-                  {({ data, error, loading }) => {
-                    return loading ? (
-                      <LinearProgress variant="query" style={{ width: '100%' }} />
-                    ) : error ? (
-                      <Error error={error} />
-                    ) : (
-                      <Employees_mongo employees_mongo={data.employees_mongo}   />
-                    )
-                  }}
-                </Query>
-               
-               
-              </TabPanel>
-                
+                <AppBar position="static">
+                  <Tabs value={value} onChange={this.handleChange} aria-label="simple tabs example">
+                    <Tab label="Blockchain" {...a11yProps(0)} />
+                    <Tab label="MongoDB"  {...a11yProps(1)} />
+                  </Tabs>
+                </AppBar>
+                <TabPanel value={value} index={0}>
+                  <AppBar position="static" style={{ background: '#292e39' }}>
+                    <Toolbar>
+                      <Filter className="filter"
+                        orderBy={orderBy}
+                        orderDirection={orderDirection}
+                        withName={withName}
+                        onOrderBy={field => this.setState(state => ({ ...state, orderBy: field }))}
+                        onOrderDirection={field => this.setState(state => ({ ...state, orderDirection: field }))}
+                        onToggleWithName={() =>
+                          this.setState(state => ({ ...state, withName: !state.withName }))
+                        }
+                        onFilterByRole={field => this.setState(state => ({ ...state, roleFilter: field }))}
+                      />
+                      <Header
+                        onHelp={this.toggleHelpDialog}
+                        onCreate={this.toggleCreateForm}
+                      //TODO cambiar el update a las card
+                      />
+                    </Toolbar>
+                  </AppBar>
+                  <Query
+                    query={EMPLOYEES_QUERY}
+                    client={client}
+                    variables={{
+                      where: {
+                        ...(withName ? { name_not: '' } : {}),
+                        ...(roleFilter ? { role: roleFilter } : {})
+                      },
+                      orderBy: orderBy,
+                      orderDirection: orderDirection,
+                    }}
+                  >
+                    {({ data, error, loading }) => {
+                      return loading ? (
+                        <LinearProgress variant="query" style={{ width: '100%' }} />
+                      ) : error ? (
+                        <Error error={error} />
+                      ) : (
+                        <Employees employees={data.employees}
+                          onUpdate={id => this.getEmployee(id)}
+                          onDelete={id => this.delete(id)} />
+                      )
+                    }}
+                  </Query>
 
-                
-                
+                </TabPanel>
+                <TabPanel value={value} index={1}>
+                  <AppBar position="static" style={{ background: '#292e39' }}>
+                    <Toolbar>
+                      <Grid container direction="row" alignItems="center" spacing={5}>
+                        <div className="divMongo">
+                          <Button onClick={this.toggleCreateMongo} className="buttonM">
+                            CREATE
+                      </Button>
+                          <Button onClick={this.toggleUpdateMongo} className="buttonM">
+                            UPDATE
+                      </Button>
+                          <Button onClick={this.toggleDeleteMongo} className="buttonM">
+                            DELETE
+                      </Button>
+                        </div>
+                        <IconButton
+                          aria-label="Delete"
+                          color="secondary"
+                          onClick={this.toggleHelpDialogMongo}
+                        >
+                          <HelpIcon />
+                        </IconButton>
+                      </Grid>
+                    </Toolbar>
+                  </AppBar>
+                  <Query
+                    query={EMPLOYEES_QUERY_MONGO}
+                    client={client_mongo}
+                    variables={{
+                      where: {
+                        ...(withName ? { name_not: '' } : {}),
+                        ...(roleFilter ? { role: roleFilter } : {})
+                      },
+                      orderBy: orderBy,
+                      orderDirection: orderDirection,
+                    }}
+                  >
+                    {({ data, error, loading }) => {
+                      return loading ? (
+                        <LinearProgress variant="query" style={{ width: '100%' }} />
+                      ) : error ? (
+                        <Error error={error} />
+                      ) : (
+                        <Employees_mongo employees_mongo={data.employees_mongo} />
+                      )
+                    }}
+                  </Query>
+
+
+                </TabPanel>
+
+
+
+
+              </Grid>
             </Grid>
           </Grid>
-          </Grid>
-        <Dialog
-          fullScreen={false}
-          open={showHelpDialog}
-          onClose={this.toggleHelpDialog}
-          aria-labelledby="help-dialog"
-        >
-          <DialogTitle id="help-dialog">{'Do you need help?'}</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Here you will be able to create, update and display employees.
-              Also, you can filter by role, order by ID, name or salary, and choose
-              the order direction: ascendant or descendant. If you need more resources, visit our repository on Github.
+          <Dialog
+            fullScreen={false}
+            open={showCreateMongo}
+            onClose={this.toggleCreateMongo}
+            aria-labelledby="help-dialog"
+          >
+            <DialogTitle id="help-dialog">{'Create a new employee direction'}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                <CreateEmployee_mongojeje></CreateEmployee_mongojeje>
               </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.toggleHelpDialog} color="primary">
-              Nah, I'm good
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.toggleCreateMongo} color="primary">
+                Continue
               </Button>
-            <Button onClick={this.gotoQuickStartGuide} color="primary" autoFocus>
-              Yes, please
+
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            fullScreen={false}
+            open={showUpdateMongo}
+            onClose={this.toggleUpdateMongo}
+            aria-labelledby="help-dialog"
+          >
+            <DialogTitle id="help-dialog">{'Update an employee direction'}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                <Update_mongo></Update_mongo>
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.toggleUpdateMongo} color="primary">
+                Continue
               </Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog
-          fullScreen={false}
-          open={showCreateForm}
-          onClose={this.toggleCreateForm}
-          aria-labelledby="help-dialog"
-        >
-          <CreateForm
-            name={name}
-            age={age}
-            role={role}
-            salary={salary}
-            submit={e => { e.preventDefault(); this.create(); this.toggleCreateForm() }}
-            onName={name1 => this.setState(state => ({ ...state, name: name1 }))}
-            onAge={age1 => this.setState(state => ({ ...state, age: age1 }))}
-            onRole={role1 => this.setState(state => ({ ...state, role: role1 }))}
-            onSalary={salary1 => this.setState(state => ({ ...state, salary: salary1 }))}
-          /> {name}{age}{role}{salary}
-        </Dialog>
-        <Dialog
-          fullScreen={false}
-          open={showCreateUpdate}
-          onClose={this.toggleCreateUpdate}
-          aria-labelledby="help-dialog"
-        >
-          <CreateFormUpdate
-            submit={e => { e.preventDefault(); this.update(); this.toggleCreateUpdate() }}
-            onName={name1 => this.setState(state => ({ ...state, name: name1 }))}
-            onAge={age1 => this.setState(state => ({ ...state, age: age1 }))}
-            onRole={role1 => this.setState(state => ({ ...state, role: role1 }))}
-            onSalary={salary1 => this.setState(state => ({ ...state, salary: salary1 }))}
-          />
-        </Dialog>
+
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            fullScreen={false}
+            open={showDeleteMongo}
+            onClose={this.toggleDeleteMongo}
+            aria-labelledby="help-dialog"
+          >
+            <DialogTitle id="help-dialog">{'Delete an employee direction'}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                <Delete_mongo></Delete_mongo>
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.toggleDeleteMongo} color="primary">
+                Continue
+              </Button>
+
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            fullScreen={false}
+            open={showHelpDialog}
+            onClose={this.toggleHelpDialog}
+            aria-labelledby="help-dialog"
+          >
+            <DialogTitle id="help-dialog">{'Do you need help?'}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Here you will be able to create, update and display employees.
+                Also, you can filter by role, order by ID, name or salary, and choose
+                the order direction: ascendant or descendant. If you need more resources, visit our repository on Github.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.toggleHelpDialog} color="primary">
+                Nah, I'm good
+              </Button>
+              <Button onClick={this.gotoQuickStartGuide} color="primary" autoFocus>
+                Yes, please
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            fullScreen={false}
+            open={showHelpDialogMongo}
+            onClose={this.toggleHelpDialogMongo}
+            aria-labelledby="help-dialog"
+          >
+            <DialogTitle id="help-dialog">{'Do you need help?'}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Here you will be able to create, update and display employees from a private Mongo database.
+                If you need more resources, visit our repository on Github.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.toggleHelpDialogMongo} color="primary">
+                Nah, I'm good
+              </Button>
+              <Button onClick={this.gotoQuickStartGuide} color="primary" autoFocus>
+                Yes, please
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            fullScreen={false}
+            open={showCreateForm}
+            onClose={this.toggleCreateForm}
+            aria-labelledby="help-dialog"
+          >
+            <CreateForm
+              name={name}
+              age={age}
+              role={role}
+              salary={salary}
+              submit={e => { e.preventDefault(); this.create(); this.toggleCreateForm() }}
+              onName={name1 => this.setState(state => ({ ...state, name: name1 }))}
+              onAge={age1 => this.setState(state => ({ ...state, age: age1 }))}
+              onRole={role1 => this.setState(state => ({ ...state, role: role1 }))}
+              onSalary={salary1 => this.setState(state => ({ ...state, salary: salary1 }))}
+            /> {name}{age}{role}{salary}
+          </Dialog>
+          <Dialog
+            fullScreen={false}
+            open={showCreateUpdate}
+            onClose={this.toggleCreateUpdate}
+            aria-labelledby="help-dialog"
+          >
+            <CreateFormUpdate
+              submit={e => { e.preventDefault(); this.update(); this.toggleCreateUpdate() }}
+              onName={name1 => this.setState(state => ({ ...state, name: name1 }))}
+              onAge={age1 => this.setState(state => ({ ...state, age: age1 }))}
+              onRole={role1 => this.setState(state => ({ ...state, role: role1 }))}
+              onSalary={salary1 => this.setState(state => ({ ...state, salary: salary1 }))}
+            />
+          </Dialog>
         </div>
       </ApolloProvider >
     );
